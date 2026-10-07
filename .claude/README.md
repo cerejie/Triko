@@ -4,7 +4,7 @@ Adapted from the TARTAR pack for Expo + Supabase. `/build` runs everything else 
 
 | Skill | When it runs |
 |---|---|
-| **build** | Any implementation prompt (auto via CLAUDE.md) or `/build`. Locate → decide → plan → wait for approval → implement → verify → report. |
+| **build** | Any implementation prompt (auto via CLAUDE.md) or `/build`. Locate → decide → plan → wait for approval → implement → verify → report, ending with a suggested commit message and a next-conversation prompt. |
 | **commit** | Suggest mode after every change (message only); commit mode on `/commit` or when asked. Format: `Type: Title` + `-` bullets. |
 | **decision-making** | Choosing between non-trivial alternatives, or when asked "X or Y?". |
 | **deep-critique** | Read-only audits: "critique / audit / review / is this production-ready". |

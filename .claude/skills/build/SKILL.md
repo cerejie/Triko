@@ -83,6 +83,23 @@ Two failures of the same command → stop and read the code.
 
 Under ten lines: what changed (clickable paths), assumptions made, what is left. End with a suggested commit message — `../commit/SKILL.md`, suggest mode.
 
+Then, always, a **Next conversation prompt** in a fenced `txt` block, ready to paste into a fresh chat. It starts with `/build` and carries, in this order:
+
+```
+/build <Start|Continue> Triko <milestone> (<name>): <one-line goal>.
+
+Read first: <docs + section numbers + migration/file names — only what the next step needs>.
+Already done: <milestones/files in place, verification status>.
+Scope:
+- <concrete deliverable>
+Locked decisions: <answers the user already gave that must not be re-asked>.
+Open decision to raise first: <[OPEN] items from docs/queue-rules.md that block this phase> | none.
+Deferred (do not build): <items the user deferred>.
+Verify: <command>. Plan the files and tests, then wait for my approval.
+```
+
+If the current phase is unfinished, the prompt continues it (`Continue`) from the exact next step. Name the next milestone from `.claude/state/ROADMAP.md` when it exists; otherwise derive it from `docs/queue-rules.md` milestone markers and `TRIKO_BUILD_REFERENCE.md` §71, and say it is inferred.
+
 ## Step 8 — Commit
 
 Only if the user asked. Follow `../commit/SKILL.md`, commit mode.
