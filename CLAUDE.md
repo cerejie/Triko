@@ -75,6 +75,13 @@ docs/                product decisions
 
 Business rules are tested in pgTAP (`npm run db:test`) before any screen uses them. Always cover offline/reconnect states and destructive actions + undo.
 
+## Skills
+
+Project skills live in `.claude/skills/` (overview: [.claude/README.md](.claude/README.md)).
+- Every implementation prompt runs through **build** (`.claude/skills/build/SKILL.md`), typed `/build` or not.
+- **commit** suggests a message after every change; commits only when asked.
+- **decision-making** for non-trivial choices, **deep-critique** for read-only audits, **checkpoint** to carry long work across sessions.
+
 ## Commits
 
 Title `Type: Short Title Case Summary` (Feature / Fix / BugFix / Migration / Update); body is one-line `-` bullets of important changes only.

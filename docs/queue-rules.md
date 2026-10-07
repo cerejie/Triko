@@ -202,3 +202,15 @@ QR tokens are random, opaque, tied to one route and session, have a start and ex
 ## 13. Open questions for later milestones
 
 - **[OPEN — before M5]** Driver home big number: `overall_position` (#8 with "4 AHEAD", as in the reference) or `waiting_position`? Tentatively overall #8 + "4 AHEAD", and NEXT IN LINE replaces the number at waiting position 1.
+
+## 14. Engine assumptions (M3)
+
+Chosen as the safest reading while implementing the queue engine. Confirm or change.
+
+- **[ASSUMPTION]** Undoing a join or a transfer marks the created entry `removed` (correction). It is never deleted. An undone transfer keeps its `queue_transfers` row with `undone_at` set, so the sender may still transfer later.
+- **[ASSUMPTION]** Undo never rolls back `queue_sequence` / `priority_sequence` counters. They only increase.
+- **[ASSUMPTION]** Undo is refused (`UNDO_NOT_ALLOWED`) if it would give a driver a second live entry, e.g. the driver joined another route after being cancelled.
+- **[ASSUMPTION]** An admin may run any operator command on any route. `remove_queue_entry` is available to operators and admins.
+- **[ASSUMPTION]** A command that changes nothing (capacity set to the same value, opening an open queue, enabling an enabled QR) is rejected with `INVALID_TRANSITION`, so it never takes the undo slot.
+- **[ASSUMPTION]** `open_queue` / `close_queue` / `enable_qr` / `disable_qr` only change route flags. QR session tokens and Realtime broadcast come in later milestones.
+- **[OPEN]** §3 worked example: the table says Leo = #8 / waiting 5 / 4 AHEAD, but the diagram gives #7 / waiting 4 / 3 AHEAD. The engine follows the diagram (both are consistent with one extra waiting driver ahead of Leo). Fix the example text.
