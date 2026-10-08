@@ -7,7 +7,7 @@
 - Parameters `p_<name>`, locals `v_<name>`.
 - Every function: `language plpgsql` (or `sql`), `security definer` only when it must bypass RLS, `set search_path = ''`, fully qualified identifiers (`public.queue_entries`, `extensions.gen_random_bytes`).
 - Commands return `jsonb` `{event_id, queue_version, entry_id, …}`.
-- Errors: `raise exception '<ERROR_KEY>' using errcode = 'P0001'`. Keys are `UPPER_SNAKE` and stable — the app maps them to copy in `src/i18n/`. Current keys: `FORBIDDEN`, `NOT_FOUND`, `INVALID_TRANSITION`, `QUEUE_CLOSED`, `CAPACITY_FULL`, `NOT_NEXT_ELIGIBLE`, `ALREADY_IN_QUEUE`, `ALREADY_IN_OTHER_QUEUE`, `INVALID_CAPACITY`, `DRIVER_INACTIVE`, `DRIVER_NOT_ASSIGNED`, `TRANSFER_NOT_ALLOWED`, `UNDO_EXPIRED`, `UNDO_NOT_LATEST`, `UNDO_NOT_ALLOWED`. Add new keys here.
+- Errors: `raise exception '<ERROR_KEY>' using errcode = 'P0001'`. Keys are `UPPER_SNAKE` and stable — the app maps them to copy in `src/i18n/`. Current keys: `FORBIDDEN`, `NOT_FOUND`, `INVALID_TRANSITION`, `QUEUE_CLOSED`, `CAPACITY_FULL`, `NOT_NEXT_ELIGIBLE`, `ALREADY_IN_QUEUE`, `ALREADY_IN_OTHER_QUEUE`, `INVALID_CAPACITY`, `DRIVER_INACTIVE`, `DRIVER_NOT_ASSIGNED`, `TRANSFER_NOT_ALLOWED`, `UNDO_EXPIRED`, `UNDO_NOT_LATEST`, `UNDO_NOT_ALLOWED`, `INVALID_INPUT`, `TRICYCLE_IN_USE`, `DRIVER_CODE_TAKEN` (internal: driver-admin retries). Edge Function-only keys: `LOGIN_FAILED`, `LOGIN_LOCKED` (+ `retry_after_seconds`), `UNAUTHORIZED`, `INTERNAL`. Add new keys here.
 - Section banners as in `0001_core.sql` (`-- ----` lines). Comment the *why*, cite the rule (`-- queue-rules §7.4`).
 - Grants at the end of each migration: `revoke execute … from public, anon; grant execute … to authenticated;`.
 

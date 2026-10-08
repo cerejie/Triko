@@ -195,7 +195,9 @@ QR tokens are random, opaque, tied to one route and session, have a start and ex
 - Login is **Driver Code + 6-digit PIN** (e.g. `DRV-001`). The internal auth email is `<code lowercased, no dash>@<AUTH_EMAIL_DOMAIN>`, e.g. `drv001@auth.triko.app`. Drivers never see it.
 - `AUTH_EMAIL_DOMAIN` comes from config and must be a domain the project controls. **[OPEN — before M4]** Confirm ownership of `triko.app`.
 - Login goes through a `login` Edge Function, which handles per-account and per-device throttling, lockout with increasing wait times, and generic error messages.
+  - Lockout (confirmed 2026-10-08): per account, 5 consecutive failures since the last success lock for 1 min; each further failure escalates to 5, 15, then 60 min (cap). Per device, 10 failures within 15 min lock for 15 min. Unknown codes are throttled the same way.
 - Operators add drivers and reset PINs in the app, through the `driver-admin` Edge Function. It checks the operator's route permission, creates the Auth user (email already confirmed), driver and tricycle records, and the route assignment. If anything fails after the Auth user is created, it deletes that Auth user.
+  - Driver Code and PIN are server-generated (confirmed 2026-10-08): next free `DRV-NNN`, random 6-digit PIN shown to the operator once.
 - Operator accounts: created by a seed or admin script for the MVP, using the same database role and route-assignment authorization as future accounts.
 - Privileged calls use the Supabase **secret key** (`sb_secret_…`), stored only in Edge Function secrets. The APK contains only the publishable key.
 
@@ -214,3 +216,12 @@ Chosen as the safest reading while implementing the queue engine. Confirm or cha
 - **[ASSUMPTION]** A command that changes nothing (capacity set to the same value, opening an open queue, enabling an enabled QR) is rejected with `INVALID_TRANSITION`, so it never takes the undo slot.
 - **[ASSUMPTION]** `open_queue` / `close_queue` / `enable_qr` / `disable_qr` only change route flags. QR session tokens and Realtime broadcast come in later milestones.
 - **[OPEN]** §3 worked example: the table says Leo = #8 / waiting 5 / 4 AHEAD, but the diagram gives #7 / waiting 4 / 3 AHEAD. The engine follows the diagram (both are consistent with one extra waiting driver ahead of Leo). Fix the example text.
+
+## 15. Auth assumptions (M4)
+
+- **[ASSUMPTION]** A tricycle with an open assignment is not given to a new driver (`TRICYCLE_IN_USE`). A free existing tricycle is reused; an inactive one is refused.
+- **[ASSUMPTION]** Resetting a PIN does not clear an active login lockout. The driver waits it out (at most 60 min).
+- **[ASSUMPTION]** Login failures never expire on their own: only a successful login resets the per-account count.
+- **[ASSUMPTION]** Only active drivers log in through `login`. A deactivated driver gets the same generic `LOGIN_FAILED`.
+- **[OPEN — before operator screens]** How operators log in (codes like `OPR-001` through `login`, or a separate flow). The seed operator uses `opr001@<domain>` and PIN 123456 for now.
+- **[OPEN — before release]** Supabase Auth's per-IP sign-in limit (`sign_in_sign_ups`, 30 / 5 min) may apply to the Edge Function's IP for all drivers at once. Confirm how the hosted project counts it before go-live.

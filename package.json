@@ -28,7 +28,7 @@
     "start": "expo start",
     "android": "expo start --android",
     "lint": "expo lint",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p supabase/functions",
     "doctor": "npx expo-doctor",
     "db:start": "npx supabase@2.120.0 start",
     "db:stop": "npx supabase@2.120.0 stop",

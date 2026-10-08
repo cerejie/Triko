@@ -104,6 +104,13 @@ create or replace function tests.fingerprint(p_route uuid default null) returns 
   )
 $$;
 
+-- A bare auth user (what driver-admin's auth.admin.createUser leaves before the profile exists).
+create or replace function tests.fake_auth_user(p_uid uuid, p_email text) returns uuid language sql as $$
+  insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, created_at, updated_at)
+  values ('00000000-0000-0000-0000-000000000000', p_uid, 'authenticated', 'authenticated', p_email, now(), now(), now())
+  returning id
+$$;
+
 -- 011 runs some helpers as authenticated/anon.
 grant usage on schema tests to authenticated, anon;
 grant execute on all functions in schema tests to authenticated, anon;
