@@ -1,15 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Redirect } from 'expo-router';
 
-// Placeholder until M4 adds auth routing into (driver) / (operator).
+import { useSessionStore } from '../src/features/auth/session.store';
+
 export default function Index() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>TRIKO</Text>
-    </View>
-  );
+  const signedIn = useSessionStore((s) => s.session !== null);
+  return <Redirect href={signedIn ? '/home' : '/login'} />;
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF' },
-  title: { fontSize: 40, fontWeight: '800', color: '#111111' },
-});

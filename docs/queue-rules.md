@@ -203,7 +203,7 @@ QR tokens are random, opaque, tied to one route and session, have a start and ex
 
 ## 13. Open questions for later milestones
 
-- **[OPEN — before M5]** Driver home big number: `overall_position` (#8 with "4 AHEAD", as in the reference) or `waiting_position`? Tentatively overall #8 + "4 AHEAD", and NEXT IN LINE replaces the number at waiting position 1.
+- **Resolved (2026-10-08)** Driver home big number is `waiting_position`, with "N AHEAD" (`waiting_ahead`) under it. NEXT IN LINE replaces the number at waiting position 1. Active drivers see their slot, reserved drivers see RESERVED #n. `overall_position` stays operator-only.
 
 ## 14. Engine assumptions (M3)
 
@@ -225,3 +225,10 @@ Chosen as the safest reading while implementing the queue engine. Confirm or cha
 - **[ASSUMPTION]** Only active drivers log in through `login`. A deactivated driver gets the same generic `LOGIN_FAILED`.
 - **[OPEN — before operator screens]** How operators log in (codes like `OPR-001` through `login`, or a separate flow). The seed operator uses `opr001@<domain>` and PIN 123456 for now.
 - **[OPEN — before release]** Supabase Auth's per-IP sign-in limit (`sign_in_sign_ups`, 30 / 5 min) may apply to the Edge Function's IP for all drivers at once. Confirm how the hosted project counts it before go-live.
+
+## 16. Driver app assumptions (M5)
+
+- **[ASSUMPTION]** The supabase-js session (including the refresh token) is stored in `expo-sqlite/kv-store`. It is app-private but not encrypted. Revisit with `expo-secure-store` before release if needed.
+- **[ASSUMPTION]** The driver home header shows the Driver Code as the driver typed it at login (uppercased). `get_my_queue_status()` returns neither the code nor the tricycle number, so the tricycle number (reference §4.3) waits for a later read.
+- **[ASSUMPTION]** A driver with no live entry sees NOT IN QUEUE with no join action. Joining by QR is a later milestone.
+- **[ASSUMPTION]** Logout is local (`signOut({ scope: 'local' })`), works offline, and clears the cached queue snapshot.
