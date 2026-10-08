@@ -52,7 +52,7 @@ declare
   v_last_success  timestamptz;
   v_fails         integer;
   v_last_fail     timestamptz;
-  v_until         timestamptz := '-infinity';
+  v_until         timestamptz := now();
   v_retry         integer;
 begin
   select max(a.attempted_at) into v_last_success
