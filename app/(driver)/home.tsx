@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -11,6 +11,7 @@ import { colors, fontSize, spacing } from '../../src/design-system/tokens';
 import { logout, useSessionStore } from '../../src/features/auth/session.store';
 import { useDriverStatusStore, useDriverStatusSync } from '../../src/features/driver/status.store';
 import { homeView } from '../../src/features/driver/status.types';
+import { useTricycleNumber } from '../../src/features/driver/tricycle';
 import type { HomeView, MyQueueStatus } from '../../src/features/driver/status.types';
 import { formatTime, t } from '../../src/i18n';
 import type { CopyKey } from '../../src/i18n';
@@ -47,8 +48,16 @@ export default function DriverHomeScreen() {
   const lastSyncedAt = useDriverStatusStore((s) => s.lastSyncedAt);
   const syncFailed = useDriverStatusStore((s) => s.syncFailed);
   const isOnline = useIsOnline();
+  const tricycleNumber = useTricycleNumber(userId);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useDriverStatusSync(userId);
+
+  // Logout can take up to a few seconds offline (session.store.ts); block a second tap.
+  const onLogout = useCallback(() => {
+    setLoggingOut(true);
+    void logout();
+  }, []);
 
   const big = useMemo(() => (status ? bigNumberProps(homeView(status)) : { value: '—' }), [status]);
   const { tone, key } = badge(status);
@@ -58,7 +67,10 @@ export default function DriverHomeScreen() {
     <SafeAreaView style={styles.safe}>
       {!isOnline ? <TrikoOfflineBanner title={t('common.offline')} detail={updated} /> : null}
       <View style={styles.header}>
-        <Text style={styles.headerText}>{driverCode ?? t('app.name')}</Text>
+        <View>
+          <Text style={styles.headerText}>{driverCode ?? t('app.name')}</Text>
+          {tricycleNumber ? <Text style={styles.subText}>{tricycleNumber}</Text> : null}
+        </View>
         {status?.route ? <Text style={styles.headerText}>{status.route.name}</Text> : null}
       </View>
 
@@ -75,7 +87,7 @@ export default function DriverHomeScreen() {
       <View style={styles.footer}>
         {isOnline && syncFailed ? <Text style={styles.updated}>{t('common.syncFailed')}</Text> : null}
         {isOnline ? <Text style={styles.updated}>{updated}</Text> : null}
-        <TrikoButton label={t('home.logout')} onPress={logout} variant="secondary" />
+        <TrikoButton label={t('home.logout')} onPress={onLogout} variant="secondary" busy={loggingOut} />
       </View>
     </SafeAreaView>
   );
@@ -90,6 +102,7 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
   },
   headerText: { fontSize: fontSize.md, fontWeight: '800', color: colors.text },
+  subText: { fontSize: fontSize.sm, fontWeight: '700', color: colors.muted },
   main: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.lg, paddingHorizontal: spacing.lg },
   queueState: { fontSize: fontSize.md, fontWeight: '700', color: colors.text },
   footer: { padding: spacing.lg, gap: spacing.md },

@@ -74,7 +74,9 @@ function syncNow(userId: string): Promise<void> {
 export function useDriverStatusSync(userId: string): void {
   const isOnline = useIsOnline();
 
+  // userId is '' for the frame between sign-out and leaving the driver stack: do nothing then.
   useEffect(() => {
+    if (!userId) return;
     if (useDriverStatusStore.getState().userId !== userId) {
       useDriverStatusStore.setState({ ...initial, userId });
     }
@@ -82,12 +84,12 @@ export function useDriverStatusSync(userId: string): void {
   }, [userId]);
 
   useEffect(() => {
-    if (isOnline) void syncNow(userId);
+    if (userId && isOnline) void syncNow(userId);
   }, [isOnline, userId]);
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (state) => {
-      if (state === 'active') void syncNow(userId);
+      if (userId && state === 'active') void syncNow(userId);
     });
     return () => subscription.remove();
   }, [userId]);

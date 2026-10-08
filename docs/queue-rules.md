@@ -229,6 +229,7 @@ Chosen as the safest reading while implementing the queue engine. Confirm or cha
 ## 16. Driver app assumptions (M5)
 
 - **[ASSUMPTION]** The supabase-js session (including the refresh token) is stored in `expo-sqlite/kv-store`. It is app-private but not encrypted. Revisit with `expo-secure-store` before release if needed.
-- **[ASSUMPTION]** The driver home header shows the Driver Code as the driver typed it at login (uppercased). `get_my_queue_status()` returns neither the code nor the tricycle number, so the tricycle number (reference §4.3) waits for a later read.
+- **[ASSUMPTION]** The driver home header shows the Driver Code as the driver typed it at login (uppercased), and under it the current tricycle number, read through RLS (`drivers` → `tricycles`) and cached per user so it shows offline.
 - **[ASSUMPTION]** A driver with no live entry sees NOT IN QUEUE with no join action. Joining by QR is a later milestone.
 - **[ASSUMPTION]** Logout is local (`signOut({ scope: 'local' })`), works offline, and clears the cached queue snapshot.
+- **[ASSUMPTION]** Offline with an expired access token, the driver stays signed in on the stored session and sees the cached queue (read-only) until the server rejects the refresh token. Offline logout clears the stored session locally after at most 3 seconds.
